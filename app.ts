@@ -9,7 +9,7 @@ import http from 'node:http';
 import log4js from 'log4js';
 import fs from 'fs';
 import bodyParser from 'body-parser';
-import jwt from 'jsonwebtoken';
+//import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 const logger: log4js.Logger = log4js.getLogger();
 logger.level = 'debug';
