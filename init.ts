@@ -70,7 +70,7 @@ module.exports = async function init() {
                 },
             },
             user: {
-                jwtkey: '114514',
+                jwtKey: '114514',
                 jwtTimeout: '24h',
             },
             watchdog: {
@@ -115,7 +115,9 @@ module.exports = async function init() {
             username TEXT NOT NULL,
             hashedPassword TEXT NOT NULL,
             verified BOOLEAN NOT NULL
-        );`);
+        );`, (err: any) => {
+            logger.error(err);
+        });
         logger.log('已创建用户数据库');
         console.timeLog('初始化');
     }
