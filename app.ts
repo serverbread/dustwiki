@@ -14,6 +14,7 @@ import cookieParser from 'cookie-parser';
 const logger: log4js.Logger = log4js.getLogger();
 logger.level = 'debug';
 const config: any = require('./config');
+logger.log(config);
 //logger.debug(config);
 const app: Application = express();
 app.use(bodyParser.json());
