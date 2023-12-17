@@ -1,0 +1,52 @@
+<script src="/resources/javascripts/sendData.js"></script>
+<h1>注册</h1>
+这是注册界面。在你为DustWiki做贡献之前，一个账号是必须的。
+<br>
+注册完毕后将会有验证邮件发到你的电子邮箱，验证后你就可以<a href="/Login">登录</a>你的账号了
+<br>
+现在，在下方的表单中填写信息来注册一个账号。你只需要有一个电子邮箱即可完成注册。
+<br>
+要求：
+
+    用户名长度在3到16个字符之间
+    只能包含字母、数字和下划线
+    不能以下划线开头或结尾
+
+<form onsubmit="
+    if (document.getElementById('password').value !== document.getElementById('confirm-password').value) {
+        document.getElementById('status').value = 'local: 密码不匹配！';
+        document.getElementById('status').style.color = 'red';
+        return false;
+    };
+    sendData({ 
+        email: document.getElementById('email').value,
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+    }, '/register');
+    return false;">
+    邮箱：
+    <br>
+    <input type='text' id='email' name='email'>
+    <br>
+    用户名：
+    <br>
+    <input type='text' id='username' name='username'>
+    <br>
+    密码：
+    <br>
+    <input type='password' id='password' name='password'>
+    <br>
+    确认密码：
+    <br>
+    <input type='password' id='confirm-password' name='confirm-password'>
+    <br>
+    <input type='submit' class="submit" value='提交'>
+    <br>
+    status: <input type='text' id='status' value='等待用户发送数据' disabled>
+    <style>
+        #status {
+            width: auto;
+            word-break: break-all;
+        }
+    </style>
+</form>

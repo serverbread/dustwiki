@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title id="title">SBWiki |</title>
+        <script src="/resources/javascripts/loadResources.js"></script>
+        <script src="/resources/javascripts/resourceFetcher.js"></script>
+        <script src="/resources/javascripts/marked.min.js"></script>
+        <script src="/resources/javascripts/templaetLoader.js"></script>
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="/resources/css/button.css"
+        />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="/resources/css/style.css"
+        />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="/resources/css/search.css"
+        />
+    </head>
+    <body>
+        <div id="top-bar" class="nav">
+            <ul>
+                <li id="user"><a href="/Account">登录</a></li>
+                <script>
+                    fetch('/api/login-status')
+                        .then(res => res.json())
+                        .then(data => {
+                            try {
+                                const userUUID = data.jwt.uuid;
+                                fetch(`/api/user/info?UUID=${userUUID}`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        document.querySelector(
+                                            '#user a',
+                                        ).innerText = data.data.username;
+                                    });
+                            } catch (e) {
+                                console.log(
+                                    e.message === 'data.jwt is undefined'
+                                        ? '用户未登录'
+                                        : '其它致命错误',
+                                );
+                            }
+                        });
+                </script>
+                <li><a href="/Docs">文档</a></li>
+                <li>
+                    <!--这里放了个搜索框-->
+                    <div>
+                        <!--搜索的表单-->
+                        <form autocomplete="off" onsubmit="return false;">
+                            <div class="search-box">
+                                <input
+                                    id="search"
+                                    class="input-none w-full"
+                                    type="text"
+                                    placeholder="按'/'快捷搜索。"
+                                />
+                            </div>
+                            <div
+                                id="search-auto-completion"
+                                style="display: none"
+                            >
+                                <ul>
+                                    <div id="in-this-page">
+                                        <h3>在本条目中搜索</h3>
+                                        <li></li>
+                                    </div>
+                                    <div id="all-site">
+                                        <h3>在全站搜索</h3>
+                                    </div>
+
+                                    <li>
+                                        <img
+                                            src="/resources/img/search.svg"
+                                            height="25px"
+                                            width="25px"
+                                        /><submit type="button" id="go-search"
+                                            >搜索</submit
+                                        >
+                                    </li>
+                                </ul>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+                <script>
+                    const searchEl = document.querySelector('#search');
+                    searchEl.onfocus = () => {
+                        // TODO: 展示自动补全列表
+                        document.getElementById(
+                            'search-auto-completion',
+                        ).style.display = '';
+                    };
+                    document.addEventListener('keydown', event => {
+                        // console.debug(event.key);
+                        // 快捷搜索
+                        switch (event.key) {
+                            case '/':
+                                searchEl.focus();
+                                // 清除最后输入的一个'/'
+                                setTimeout(() => {
+                                    searchEl.value = searchEl.value.slice(
+                                        0,
+                                        Number(searchEl.value.length) - 1,
+                                    );
+                                }, 1);
+                                break;
+                            // 按下方向键时高亮选中项
+                            case 'ArrowUp':
+                                break;
+                            case 'ArrowDown':
+                                break;
+                        }
+                        if (event.key === 'ArrowDown') {
+                        }
+                    });
+                    const title1 = document.querySelector('#in-this-page h3');
+                    const title2 = document.querySelector('#all-site h3');
+                    const searchButton = document.getElementById('go-search');
+                    const title1Original = title1.innerText;
+                    const title2Original = title2.innerText;
+                    const searchButtonOriginal = searchButton.innerText;
+                    searchEl.addEventListener('input', event => {
+                        if (event.target.value === '') {
+                            document.getElementById(
+                                'search-auto-completion',
+                            ).style.display = 'none';
+                        } else {
+                            document.getElementById(
+                                'search-auto-completion',
+                            ).style.display = '';
+                        }
+                        //console.log(event.key);
+                        title1.innerText = `${title1Original}${event.target.value}`;
+                        title2.innerText = `${title2Original}${event.target.value}`;
+                        searchButton.innerText = `${searchButtonOriginal}${event.target.value}`;
+                        // 搜索渲染逻辑
+                        //TODO: 将此处的搜索改成非只出现过一次的
+                        // 本条目搜索
+                        const text =
+                            document.getElementById('content').innerText;
+                        const reg = new RegExp(event.target.value);
+                        const position = text.search(reg);
+                        if (position === -1) {
+                            document.querySelector(
+                                '#in-this-page li',
+                            ).innerText = '没有相关结果';
+                        } else {
+                            document.querySelector(
+                                '#in-this-page li',
+                            ).innerText = text.slice(
+                                position - 3,
+                                position + 20,
+                            );
+                        }
+
+                        // 全站搜索
+                        fetch(`/api/search?keyword=${searchEl.value}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                //console.debug(data);
+                                // TODO: 编写渲染的效果
+                                // 清除原有的li
+                                const liEls =
+                                    document.querySelectorAll('#all-site li');
+                                liEls.forEach(li => {
+                                    li.remove();
+                                });
+                                if (data.error) {
+                                    document.querySelector(
+                                        '#all-site li',
+                                    ).innerText = '没有相关结果';
+                                } else {
+                                    for (let i in data.matches) {
+                                        for (let j in data.matches[i].results) {
+                                            const liEl =
+                                                document.createElement('li');
+                                            const buttonEl =
+                                                document.createElement(
+                                                    'button',
+                                                );
+                                            buttonEl.innerText = `${i}页面：\n${data.matches[i].results[j].content}`;
+                                            buttonEl.onclick = () => {
+                                                window.location = `/${i}`;
+                                            }
+                                            document
+                                                .getElementById('all-site')
+                                                .appendChild(liEl)
+                                                .appendChild(buttonEl);
+                                        }
+                                        /*
+                                        buttonEl.innerText = `${i}页面：\n${data.matches[i].片段}`;
+                                        document
+                                            .getElementById('all-site')
+                                            .appendChild(liEl)
+                                            .appendChild(buttonEl);
+                                            */
+                                    }
+                                }
+                            });
+                    });
+                </script>
+            </ul>
+            <style>
+                #top-bar ul {
+                    position: relative;
+                    padding-left: 0;
+                    width: 100%;
+                    height: 100%;
+                    /*margin-top: 10px;*/
+                    margin: 0;
+                    display: flex;
+                }
+                #top-bar ul li {
+                    position: relative;
+                    display: flex;
+                    width: auto;
+                    flex-direction: row;
+                    margin: 10px;
+                    margin-left: 30px;
+                    margin-right: 30px;
+                    text-align: center;
+                    /*justify-content: center;*/
+                }
+                #top-bar ul li a {
+                    display: inline-flex;
+                    justify-content: center;
+                    flex-direction: column;
+                }
+            </style>
+        </div>
+        <div id="side-bar">
+            <style>
+                #side-bar {
+                    position: fixed;
+                    border-radius: 10px;
+                    z-index: 0;
+                    top: 50px;
+                    height: 100%;
+                    left: 0;
+                    float: left;
+                    background-color: white;
+                    border-color: gray;
+                    border-style: solid;
+                    border-left: 0;
+                    border-top: 0;
+                    border-bottom: 0;
+                    resize: initial;
+                }
+                #side-bar ul {
+                    padding-left: 0;
+                    width: auto;
+                }
+                #side-bar ul li {
+                    display: block;
+                    position: relative;
+                    list-style-type: none;
+                    border-color: #ff000000;
+                    border-style: solid;
+                    border-top: 0;
+                    border-left: 0;
+                    border-right: 0;
+                    left: 1px;
+                }
+                #side-bar ul li:hover {
+                    border-color: lightgreen;
+                }
+                #side-bar ul .no-bt:hover {
+                    border-color: white;
+                }
+            </style>
+            <ul class="text-green">
+                <li><img src="/resources/img/icon.png" /></li>
+                <li><a href="/" class="link-hover2">主页</a></li>
+                <li><a href="/Welcome" class="link-hover2">欢迎</a></li>
+                <li><a href="/Coffee" class="link-hover2">编辑器操场</a></li>
+                <li class="no-bt">=====================</li>
+                <li><a href="/Account" class="link-hover2">账号</a></li>
+                <li><a href="/Register" class="link-hover2">注册</a></li>
+            </ul>
+            <div id="broadcast">
+                <style>
+                    #broadcast {
+                        position: relative;
+                        border-color: black;
+                        border-style: dashed;
+                        height: 50%;
+                        width: auto;
+                    }
+                    #broadcast textarea {
+                        position: relative;
+                        border-left: 0;
+                        border-right: 0;
+                        color: black;
+                        border-color: black;
+                        resize: none;
+                        margin-left: 10px;
+                        margin-right: 10px;
+                        margin-bottom: 20px;
+                        height: 80%;
+                    }
+                </style>
+                <h2>
+                    <img
+                        src="/resources/img/broadcast-tower.svg"
+                        width="20px"
+                        height="20px"
+                    />
+                    公告
+                </h2>
+                <textarea disabled></textarea>
+                <script>
+                    fetch('/api/broadcast')
+                        .then(res => res.json())
+                        .then(data => {
+                            document.querySelector(
+                                '#broadcast textarea',
+                            ).innerText = data.broadcast;
+                        });
+                </script>
+            </div>
+        </div>
+        <div id="box">%REPLACE_HERE%</div>
+    </body>
+</html>

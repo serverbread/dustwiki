@@ -1,0 +1,43 @@
+<h1>登录</h1>
+这是登录界面，请在下方的表单中填入信息登录。
+<br />
+一般来说，如果你成功地验证了你的账号，你会被重定向到此处。
+
+<script>
+    fetch('/api/login-status')
+        .then(res => res.json())
+        .then(data => {
+            if (!data.isLogin) {
+                console.log('用户未登录');
+                return;
+            }
+            console.log('用户已登录');
+            document.getElementById('un-logged').hidden = true;
+            document.getElementById('logged').hidden = false;
+        });
+</script>
+<script src="/resources/javascripts/sendData.js"></script>
+<form
+    id="un-logged"
+    onsubmit="sendData({ account: document.getElementById('account').value, password: document.getElementById('password').value }, '/login'); return false"
+>
+    账号名或邮箱：
+    <br />
+    <input type="text" id="account" name="account" />
+    <br />
+    密码：
+    <br />
+    <input type="password" id="password" name="password" />
+    <br />
+    <input type="submit" value="提交" />
+    <br />
+    status: <input type="text" id="status" value="等待用户发送数据" disabled />
+    <br />
+    <p>没有DustWiki账号？现在<a href="/Register">注册一个</a>。</p>
+</form>
+<div id="logged" hidden>
+    <p>有个好消息是，你已经登陆了，无需再次登录</p>
+    <br />
+    <p><a href="/Account">点击此处查看账户信息</a></p>
+    <span class="hide-need">不然留在这干嘛，发呆吗？</span>
+</div>

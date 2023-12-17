@@ -1,0 +1,72 @@
+button {
+    border: 2px;
+    border-style: initial;
+    border-color: black;
+    background-color: lightgreen;
+    height: auto;
+    width: auto;
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+.dangerous {
+    background-color: lightcoral;
+}
+
+button a {
+    display: inline-block;
+    height: 100%;
+    width: 100%;
+    color: black;
+    text-align: center;
+    margin: 10px;
+    margin-left: 0;
+}
+button img {
+    display: inline-block;
+}
+
+button a:visited {
+    color: black;
+}
+
+
+a {
+    text-decoration: none;
+}
+
+a:visited {
+    color: seagreen;
+}
+
+.submit:hover {
+    background-color: lightblue;
+}
+
+.submit:disabled {
+    background-color: gray;
+}
+
+.submit {
+    background-image: url('/resources/img/check.svg');
+    background-size: 20px 20px;
+    background-position: 10px;
+    background-repeat: no-repeat;
+    width: 150px;
+    color: #000;
+}
+
+input[type='submit'] {
+    cursor: pointer;
+    border: 2px;
+    border-style: initial;
+    border-color: black;
+    background-color: lightgreen;
+    font-size: 20px;
+    margin: 5px;
+}
+
+input[type='submit']:hover {
+    background-color: lightblue;
+}

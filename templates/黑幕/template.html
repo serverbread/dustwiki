@@ -1,0 +1,20 @@
+<span class="shady">%text%</span>
+<!--
+    当用户在条目中使用插值语法( E.G:{{黑幕|这是个模板！}} )时，
+    将template.html中所有的
+    用%%的包裹的占位符按顺序替换
+    为转入插值语法中的参数
+    比如{{黑幕|这是一段黑幕}}
+    将根据template.html中的内容
+    <span class="shady">%text%</span>
+    将%text%根据template.json中
+    {
+        "ext": "md",
+        "bind": ["userName"]
+    }
+    中的bind键所对应的列表
+    按顺序替换占位符为对应传入参数的值
+    比如此处将%userName%替换为'这是一段黑幕'
+    再在渲染将这个模板被替换为html：
+    <span class="shady">这是一段黑幕</span>
+-->

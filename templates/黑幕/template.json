@@ -1,0 +1,8 @@
+{
+    "ext": "html",
+    "bind": ["userName"],
+    "extends": {
+        "style": true,
+        "script": false
+    }
+}

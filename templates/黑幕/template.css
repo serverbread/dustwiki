@@ -1,0 +1,8 @@
+.shady {
+    color: black;
+    text-shadow: none;
+    background-color: black;
+}
+.shady:hover {
+    color: white;
+}

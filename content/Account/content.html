@@ -1,0 +1,38 @@
+<script>
+    fetch('/api/login-status')
+        .then(res => res.json())
+        .then(data => {
+            if (!data.isLogin) {
+                console.log('用户未登录');
+                return;
+            }
+            const userUUID = data.jwt.uuid;
+            fetch(`/api/user/info?UUID=${userUUID}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('un-logged').hidden = true;
+                    document.getElementById('user-info').hidden = false;
+                    document.getElementById('uuid').value = data.data.uuid;
+                    document.getElementById('username').value =
+                        data.data.username;
+                    document.getElementById('email').value = data.data.email;
+                });
+        });
+    fetchResource('/resources/css/status.css', 'style');
+</script>
+<h1>账号</h1>
+
+这是你的账号界面，你可以在这查看你账号的基本信息。
+
+<p id="un-logged">在此之前，你必须<a href="/Login">登录</a>。</p>
+<div id="user-info" hidden="">
+    <img href="/user/%UUID%/headshot">
+    头像
+    账号uuid：<input class="status" id="uuid" disabled /> 用户名：<input
+        class="status"
+        id="username"
+        disabled
+    />
+    邮箱：<input class="status" id="email" disabled />
+    <button class="submit dangerous"><a href="/logout">登出</a></button>
+</div>

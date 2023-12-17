@@ -1,0 +1,102 @@
+<style>
+    #editor {
+        position: relative;
+        width: 100%;
+        height: 680px;
+        resize: none;
+    }
+    #commit {
+        position: relative;
+        width: 100%;
+    }
+    #commit-inf {
+        position: relative;
+        width: auto;
+    }
+</style>
+
+<div id="content">
+    <h2>编辑页面源代码</h2>
+    <style>
+        #content {
+            margin: 30px;
+        }
+    </style>
+    <textarea id="editor"></textarea>
+    <input class="status" disabled />
+    <div id="commit">
+        <span style="background-color: lightgray"
+            >$ git commit -m "<input
+                id="commit-inf"
+                style="
+                    background-color: lightgray;
+                    border-top: 0px;
+                    border-left: 0px;
+                    border-right: 0px;
+                    border-color: black;
+                "
+            />"</span
+        >
+        <button id="commit-bt" class="submit">提交更改</button>
+        <img
+            id="format"
+            height="50px"
+            width="100px"
+            style="position: relative; float: right"
+        />
+    </div>
+    <script>
+        const contentPath = window.location.href
+            .replace('https://', '')
+            .replace(window.location.href.split('/')[2], '')
+            .replace('/', '')
+            .replace('editor/', ''); // such as '114514.md'
+        //alert(contentPath);
+        const titleEl = document.getElementsByTagName('title')[0];
+        fetch(
+            `https://${
+                window.location.toString().split('/')[2]
+            }/api/content/${contentPath}`,
+        )
+            .then(res => {
+                //console.debug(res.status);
+                if (!res.ok) {
+                    document.getElementById('editor').disabled = true;
+                    document.getElementById('commit-inf').disabled = true;
+                    document.getElementById('commit-bt').disabled = true;
+                    console.error(res.status);
+                }
+                return res.json();
+            })
+            .then(data => {
+                const ext = data.ext;
+                const content = data.content;
+
+                const editorEl = document.getElementById('editor');
+                const statusEl = document.getElementsByClassName('status')[0];
+
+                editorEl.value = content;
+                statusEl.value = `格式 ${ext}      字数 ${content.length}`;
+                console.debug(statusEl.value); // 此处明确输出了值
+                document.getElementById('format').src = `/resources/img/${
+                    ext === 'md' ? 'markdown' : 'html5'
+                }.svg`;
+                if (ext === 'html') {
+                    document.getElementById('format').style.overflow = 'hidden';
+                    document.getElementById('format').style.filter =
+                        'drop-shadow(#F16529 2000px 0)';
+                    document.getElementById('format').style.transform =
+                        'translateX(-2000px)';
+                    /*
+                        overflow: hidden; // 超出部分隐藏
+                        filter: drop-shadow(#FFF 100px 0);  // 在右侧 100px 加一个 #FFF 的阴影
+                        transform: translateX(-100px); // 整体向左偏移 100px 原本的元素超出边界不显示。实现效果：本来的位置被白色阴影替换。
+                    */
+                }
+                /*
+                titleEl.innerText +=
+                    document.querySelector('#content h1').innerText;*/
+            });
+        //console.debug(document.getElementsByClassName('status').value);
+    </script>
+</div>
