@@ -92,6 +92,8 @@ async function bootstrap() {
         logger.log('http服务器已启动！');
     });
     console.timeEnd(timerName);
+    // TODO: 启动性能检测
+    setInterval(require('./status'), 1000);
 }
 
 bootstrap();
